@@ -131,6 +131,7 @@ class InferencePipeline(torch.nn.Module):
                 output[:, block_index * self.num_frame_per_block:(
                     block_index + 1) * self.num_frame_per_block] = current_ref_latents
 
+                print(f"generator input shape: {current_ref_latents.shape}")
                 self.generator(
                     noisy_image_or_video=current_ref_latents,
                     conditional_dict=conditional_dict,

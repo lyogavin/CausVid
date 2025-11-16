@@ -62,6 +62,8 @@ for prompt_index in tqdm(range(len(dataset))):
         sampled_noise = torch.randn(
             [1, 21, 16, 60, 104], device="cuda", dtype=torch.bfloat16
         )
+        # noise (torch.Tensor): The input noise tensor of shape
+        #        (batch_size, num_frames, num_channels, height, width).
 
         video, latents = pipeline.inference(
             noise=sampled_noise,
@@ -70,15 +72,20 @@ for prompt_index in tqdm(range(len(dataset))):
             start_latents=start_latents
         )
 
+        print(f"video shape: {video.shape}")
+
         current_video = video[0].permute(0, 2, 3, 1).cpu().numpy()
 
         start_frame = encode(pipeline.vae, (
             video[:, -4 * (args.num_overlap_frames - 1) - 1:-4 * (args.num_overlap_frames - 1), :] * 2.0 - 1.0
         ).transpose(2, 1).to(torch.bfloat16)).transpose(2, 1).to(torch.bfloat16)
 
+        print(f"after encode start_frame shape: {start_frame.shape}")
+
         start_latents = torch.cat(
             [start_frame, latents[:, -(args.num_overlap_frames - 1):]], dim=1
         )
+        print(f"after concat start_latents shape: {start_latents.shape}")
 
         all_video.append(current_video[:-(4 * (args.num_overlap_frames - 1) + 1)])
 
