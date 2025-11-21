@@ -72,20 +72,20 @@ for prompt_index in tqdm(range(len(dataset))):
             start_latents=start_latents
         )
 
-        print(f"video shape: {video.shape}")
+        print(f"video shape: {video.shape}") # [1, 81, 3, 480, 832]
 
-        current_video = video[0].permute(0, 2, 3, 1).cpu().numpy()
+        current_video = video[0].permute(0, 2, 3, 1).cpu().numpy() # to seq_len, w, h, c
 
         start_frame = encode(pipeline.vae, (
             video[:, -4 * (args.num_overlap_frames - 1) - 1:-4 * (args.num_overlap_frames - 1), :] * 2.0 - 1.0
         ).transpose(2, 1).to(torch.bfloat16)).transpose(2, 1).to(torch.bfloat16)
 
-        print(f"after encode start_frame shape: {start_frame.shape}")
+        print(f"after encode start_frame shape: {start_frame.shape}") # [1, 1, 16, 60, 104]
 
         start_latents = torch.cat(
             [start_frame, latents[:, -(args.num_overlap_frames - 1):]], dim=1
         )
-        print(f"after concat start_latents shape: {start_latents.shape}")
+        print(f"after concat start_latents shape: {start_latents.shape}") # [1, 3, 16, 60, 104]
 
         all_video.append(current_video[:-(4 * (args.num_overlap_frames - 1) + 1)])
 

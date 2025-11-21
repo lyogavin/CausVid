@@ -131,7 +131,9 @@ class InferencePipeline(torch.nn.Module):
                 output[:, block_index * self.num_frame_per_block:(
                     block_index + 1) * self.num_frame_per_block] = current_ref_latents
 
-                print(f"generator input shape: {current_ref_latents.shape}")
+                print(f"generator input shape: {current_ref_latents.shape}") #[1, 3, 16, 60, 104]
+
+                # for updating the cache only, so we just ignore the output
                 self.generator(
                     noisy_image_or_video=current_ref_latents,
                     conditional_dict=conditional_dict,
@@ -186,6 +188,7 @@ class InferencePipeline(torch.nn.Module):
             output[:, block_index * self.num_frame_per_block:(
                 block_index + 1) * self.num_frame_per_block] = denoised_pred
 
+            # run this for updating the cache only, so we just ignore the output
             self.generator(
                 noisy_image_or_video=denoised_pred,
                 conditional_dict=conditional_dict,
